@@ -1,0 +1,7 @@
+﻿<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <dependencies>
+            <dependency id="Newtonsoft.Json" version="13.0.3" />
+        </dependencies>
+    </metadata>
+</package>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>KhatiExtendedAdo</id>
+    <version>6.0.2</version>
+    <title>Khati Extended ADO Properties</title>
+    <authors>KhatiExtendedADO</authors>
+    <icon>iconDb.png</icon>
+    <description>This Package is use for to Manage Sql (Insert, BulkInsert, Update, Delete and Get) with more Manageability using ADO.NET library</description>
+    <dependencies>
+      <group targetFramework="net6.0">
+        <dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="13.0.3" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SqlClient" version="4.8.6" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\BS483\source\repos\KhatiExtendedADOLib\KhatiExtendedADO\bin\Debug\net6.0\KhatiExtendedADO.dll" target="lib\net6.0\KhatiExtendedADO.dll" />
+    <file src="C:\Users\BS483\Downloads\iconDb.png" target="\iconDb.png" />
+  </files>
+</package>
