@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "KhatiExtendedADO/6.0.4": {
+      "KhatiExtendedADO/6.0.6": {
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
           "Newtonsoft.Json": "13.0.3",
@@ -110,7 +110,7 @@
     }
   },
   "libraries": {
-    "KhatiExtendedADO/6.0.4": {
+    "KhatiExtendedADO/6.0.6": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

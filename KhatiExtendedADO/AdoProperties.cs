@@ -194,6 +194,32 @@ namespace KhatiExtendedADO
                 return (false, "Data Insertion Failed", ex.Message);
             }
         }
+        public string SqlReadJson(string Query)
+        {
+           var connection = new SqlConnection(ConnectionString());
+           connection.Open();
+           SqlCommand comand = new SqlCommand(
+           Query, connection);
+           comand.CommandTimeout = 300;
+           var reading = comand.ExecuteReader();
+           string? json = ToJson(reading);
+           connection.Close();
+           reading.Close();
+           return json;
+        }
+        public string SqlReadJson(string connectionString, string Query)
+        {
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            SqlCommand comand = new SqlCommand(
+            Query, connection);
+            comand.CommandTimeout = 300;
+            var reading = comand.ExecuteReader();
+            string? json = ToJson(reading);
+            connection.Close();
+            reading.Close();
+            return json;
+        }
 
         #region others
         private DataTable ToDataTable<T>(List<T> items)
