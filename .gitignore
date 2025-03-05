@@ -1,0 +1,31 @@
+# Ignore Visual Studio & JetBrains Rider folders
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore build output
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+
+# Ignore NuGet packages
+*.nupkg
+packages/
+project.lock.json
+project.assets.json
+
+# Ignore logs & temp files
+*.log
+*.tlog
+*.cache
+*.tmp
+
+# Ignore Rider / ReSharper files
+*.DotSettings
+_ReSharper*/

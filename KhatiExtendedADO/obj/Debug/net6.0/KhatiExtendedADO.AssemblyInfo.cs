@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyDescriptionAttribute("This Package is use for to Manage Sql (Insert, BulkInsert, Update, Delete and Get" +
     ") with more Manageability using ADO.NET library")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("6.0.6.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("6.0.6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("6.0.6+b26b0ada7921ad4775e2cae30e77899bdb8c7507")]
 [assembly: System.Reflection.AssemblyProductAttribute("KhatiExtendedADO")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KhatiExtendedADO")]
 [assembly: System.Reflection.AssemblyVersionAttribute("6.0.6.0")]
