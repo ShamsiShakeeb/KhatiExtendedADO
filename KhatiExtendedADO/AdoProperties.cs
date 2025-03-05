@@ -1,8 +1,8 @@
-﻿using System.Data.SqlClient;
-using System.Data;
+﻿using System.Data;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
 
 namespace KhatiExtendedADO
