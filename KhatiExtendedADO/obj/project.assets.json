@@ -269,7 +269,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "6.0.6",
+    "version": "8.0.1",
     "restore": {
       "projectUniqueName": "C:\\MyProductionLibrary\\KhatiExtendedADO\\KhatiExtendedADO\\KhatiExtendedADO.csproj",
       "projectName": "KhatiExtendedAdo",

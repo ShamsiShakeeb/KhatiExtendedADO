@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <PackageId>KhatiExtendedAdo</PackageId>
     <Description>This Package is use for to Manage Sql (Insert, BulkInsert, Update, Delete and Get) with more Manageability using ADO.NET library</Description>
-    <Version>6.0.6</Version>
+    <Version>8.0.1</Version>
     <Title>Khati Extended ADO Properties</Title>
     <PackageIcon>iconDb.png</PackageIcon>
   </PropertyGroup>
