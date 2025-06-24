@@ -14,18 +14,18 @@ namespace KhatiExtendedADO
         {
             return "";
         }
-        public Response<string> SqlWrite(string Query)
+        public async Task<Response<string>> SqlWriteAsync(string Query)
         {
             try
             {
                 SqlConnection sc = new SqlConnection();
                 SqlCommand com = new SqlCommand();
                 sc.ConnectionString = (ConnectionString());
-                sc.Open();
+                await sc.OpenAsync();
                 com.Connection = sc;
                 com.CommandText = (Query);
-                com.ExecuteNonQuery();
-                sc.Close();
+                await com.ExecuteNonQueryAsync();
+                await sc.CloseAsync();
                 var model = new Response<string>()
                 {
                     Success = true,
@@ -47,20 +47,20 @@ namespace KhatiExtendedADO
                 return model;
             }
         }
-        public Response<TResponse> SqlRead<TResponse>(string Query)
+        public async Task<Response<TResponse>> SqlReadAsync<TResponse>(string Query)
         {
             try
             {
                 var connection = new SqlConnection(ConnectionString());
-                connection.Open();
+                await connection.OpenAsync();
                 SqlCommand comand = new SqlCommand(
                 Query, connection);
                 comand.CommandTimeout = 300;
-                var reading = comand.ExecuteReader();
+                var reading = await comand.ExecuteReaderAsync();
                 string? json = ToJson(reading);
                 var result = JsonConvert.DeserializeObject<TResponse>(json);
-                connection.Close();
-                reading.Close();
+                await connection.CloseAsync();
+                await reading.CloseAsync();
                 var model = new Response<TResponse>()
                 {
                     Success = true,
@@ -84,20 +84,20 @@ namespace KhatiExtendedADO
                 return model;
             }
         }
-        public Response<TResponse> SqlReadScalerModel<TResponse>(string Query) where TResponse : class
+        public async Task<Response<TResponse>> SqlReadScalerModelAsync<TResponse>(string Query) where TResponse : class
         {
             try
             {
                 var connection = new SqlConnection(ConnectionString());
-                connection.Open();
+                await connection.OpenAsync();
                 SqlCommand comand = new SqlCommand(
                 Query, connection);
                 comand.CommandTimeout = 300;
-                var reading = comand.ExecuteReader();
+                var reading = await comand.ExecuteReaderAsync();
                 string? json = ToJson(reading);
                 var result = JsonConvert.DeserializeObject<List<TResponse>>(json);
-                connection.Close();
-                reading.Close();
+                await connection.CloseAsync();
+                await reading.CloseAsync();
                 var model = new Response<TResponse>()
                 {
                     Success = true,
@@ -121,21 +121,22 @@ namespace KhatiExtendedADO
                 return model;
             }
         }
-        public Response<TResponse> SqlReadScalerValue<TResponse>(string Query)
+        public async Task<Response<TResponse>> SqlReadScalerValueAsync<TResponse>(string Query)
         {
             try
             {
                 var connection = new SqlConnection(ConnectionString());
-                connection.Open();
+                await connection.OpenAsync();
                 SqlCommand comand = new SqlCommand(
                 Query, connection);
                 comand.CommandTimeout = 300;
-                var reading = (TResponse)comand.ExecuteScalar();
-                connection.Close();
+                var response = comand.ExecuteScalarAsync();
+                var reading = await response;
+                await connection.CloseAsync();
                 var model = new Response<TResponse>()
                 {
                     Success = true,
-                    Data = reading,
+                    Data = reading == null? default(TResponse):(TResponse)reading,
                     Message = "Execution Successfull",
                     Exception = null
                 };
@@ -155,7 +156,7 @@ namespace KhatiExtendedADO
                 return model;
             }
         }
-        public (bool success, string? message, string? errorMessage) SqlBulkUpload<T>(List<T> model,
+        public async Task<(bool success, string? message, string? errorMessage)> SqlBulkUploadAsync<T>(List<T> model,
             string tableName) where T : class
         {
             SqlConnection con = new SqlConnection(ConnectionString());
@@ -165,10 +166,10 @@ namespace KhatiExtendedADO
 
                 sqlBulkCopy.DestinationTableName = tableName;
                 sqlBulkCopy.BulkCopyTimeout = 120;
-                con.Open();
+                await con.OpenAsync();
                 DataTable dt = ToDataTable(model);
-                sqlBulkCopy.WriteToServer(dt);
-                con.Close();
+                await sqlBulkCopy.WriteToServerAsync(dt);
+                await con.CloseAsync();
                 return (true, "Data Inserted Successfully", null);
             }
             catch (Exception ex)
@@ -193,32 +194,6 @@ namespace KhatiExtendedADO
 
                 return (false, "Data Insertion Failed", ex.Message);
             }
-        }
-        public string SqlReadJson(string Query)
-        {
-           var connection = new SqlConnection(ConnectionString());
-           connection.Open();
-           SqlCommand comand = new SqlCommand(
-           Query, connection);
-           comand.CommandTimeout = 300;
-           var reading = comand.ExecuteReader();
-           string? json = ToJson(reading);
-           connection.Close();
-           reading.Close();
-           return json;
-        }
-        public string SqlReadJson(string connectionString, string Query)
-        {
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            SqlCommand comand = new SqlCommand(
-            Query, connection);
-            comand.CommandTimeout = 300;
-            var reading = comand.ExecuteReader();
-            string? json = ToJson(reading);
-            connection.Close();
-            reading.Close();
-            return json;
         }
 
         #region others
