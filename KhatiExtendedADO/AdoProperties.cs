@@ -75,7 +75,7 @@ namespace KhatiExtendedADO
                 };
             }
         }
-        public async Task<Response<TResponse>> SqlReadAsync<TResponse>(string query, Dictionary<string, object>? parameters)
+        public async Task<Response<TResponse>> SqlReadAsync<TResponse>(string query, Dictionary<string, object>? parameters = null)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace KhatiExtendedADO
                 };
             }
         }
-        public async Task<Response<TResponse>> SqlReadScalerModelAsync<TResponse>(string query, Dictionary<string, object>? parameters) 
+        public async Task<Response<TResponse>> SqlReadScalerModelAsync<TResponse>(string query, Dictionary<string, object>? parameters = null) 
         {
             try
             {
@@ -188,7 +188,7 @@ namespace KhatiExtendedADO
                 };
             }
         }
-        public async Task<Response<TResponse>> SqlReadScalerValueAsync<TResponse>(string query, Dictionary<string, object>? parameters)
+        public async Task<Response<TResponse>> SqlReadScalerValueAsync<TResponse>(string query, Dictionary<string, object>? parameters = null)
         {
             try
             {
