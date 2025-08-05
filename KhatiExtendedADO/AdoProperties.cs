@@ -14,146 +14,234 @@ namespace KhatiExtendedADO
         {
             return "";
         }
-        public async Task<Response<string>> SqlWriteAsync(string Query)
+        public virtual int TimeOut()
+        {
+            return 300;
+        }
+        public async Task<Response<string>> SqlWriteAsync(string query, Dictionary<string, object> parameters)
         {
             try
             {
-                SqlConnection sc = new SqlConnection();
-                SqlCommand com = new SqlCommand();
-                sc.ConnectionString = (ConnectionString());
-                await sc.OpenAsync();
-                com.Connection = sc;
-                com.CommandText = (Query);
-                await com.ExecuteNonQueryAsync();
-                await sc.CloseAsync();
-                var model = new Response<string>()
+                if (!query.Contains("@"))
+                {
+                    return new Response<string>
+                    {
+                        Success = false,
+                        Message = "Query must be parameterized (contain @parameters).",
+                        Data = null,
+                        Exception = "Parameterless query rejected for security."
+                    };
+                }
+
+                if (parameters == null || parameters.Count == 0)
+                {
+                    return new Response<string>
+                    {
+                        Success = false,
+                        Message = "Parameter dictionary is empty. Parameterized query must have values.",
+                        Data = null,
+                        Exception = "Missing parameter values."
+                    };
+                }
+
+                using (SqlConnection sc = new SqlConnection(ConnectionString()))
+                using (SqlCommand com = new SqlCommand(query, sc))
+                {
+                    foreach (var param in parameters)
+                    {
+                        com.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                    }
+
+                    await sc.OpenAsync();
+                    await com.ExecuteNonQueryAsync();
+                }
+
+                return new Response<string>
                 {
                     Success = true,
                     Data = "No Data Available",
                     Message = "Executed Successfully",
                     Exception = null
                 };
-                return model;
             }
             catch (Exception ex)
             {
-                var model = new Response<string>()
+                return new Response<string>
                 {
                     Success = false,
                     Data = null,
-                    Message = ex.Message.ToString(),
+                    Message = ex.Message,
                     Exception = ex.ToString()
                 };
-                return model;
             }
         }
-        public async Task<Response<TResponse>> SqlReadAsync<TResponse>(string Query)
+        public async Task<Response<TResponse>> SqlReadAsync<TResponse>(string query, Dictionary<string, object>? parameters)
         {
             try
             {
-                var connection = new SqlConnection(ConnectionString());
+
+                if (query.Contains("WHERE", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!query.Contains("@") || parameters == null || parameters.Count == 0)
+                    {
+                        return new Response<TResponse>
+                        {
+                            Success = false,
+                            Data = default,
+                            Message = "Query contains a WHERE clause but no parameters were provided.",
+                            Exception = "Unsafe or incomplete parameterized query."
+                        };
+                    }
+                }
+
+
+                using var connection = new SqlConnection(ConnectionString());
+                using var command = new SqlCommand(query, connection);
+
+                command.CommandTimeout = TimeOut();
+
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                    }
+                }
+
                 await connection.OpenAsync();
-                SqlCommand comand = new SqlCommand(
-                Query, connection);
-                comand.CommandTimeout = 300;
-                var reading = await comand.ExecuteReaderAsync();
-                string? json = ToJson(reading);
+                using var reader = await command.ExecuteReaderAsync();
+                string? json = ToJson(reader);
                 var result = JsonConvert.DeserializeObject<TResponse>(json);
-                await connection.CloseAsync();
-                await reading.CloseAsync();
-                var model = new Response<TResponse>()
+
+                return new Response<TResponse>
                 {
                     Success = true,
                     Data = result,
-                    Message = "Execution Successfull",
+                    Message = "Execution Successful",
                     Exception = null
                 };
-
-                return model;
             }
             catch (Exception ex)
             {
-                var model = new Response<TResponse>()
+                return new Response<TResponse>
                 {
                     Success = false,
-                    Data = default(TResponse),
-                    Message = ex.Message.ToString(),
+                    Data = default,
+                    Message = ex.Message,
                     Exception = ex.ToString()
                 };
-
-                return model;
             }
         }
-        public async Task<Response<TResponse>> SqlReadScalerModelAsync<TResponse>(string Query) where TResponse : class
+        public async Task<Response<TResponse>> SqlReadScalerModelAsync<TResponse>(string query, Dictionary<string, object>? parameters) 
         {
             try
             {
-                var connection = new SqlConnection(ConnectionString());
+                if (query.Contains("WHERE", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!query.Contains("@") || parameters == null || parameters.Count == 0)
+                    {
+                        return new Response<TResponse>
+                        {
+                            Success = false,
+                            Data = default,
+                            Message = "Query contains a WHERE clause but no parameters were provided.",
+                            Exception = "Unsafe or incomplete parameterized query."
+                        };
+                    }
+                }
+
+                using var connection = new SqlConnection(ConnectionString());
+                using var command = new SqlCommand(query, connection)
+                {
+                    CommandTimeout = TimeOut()
+                };
+
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                    }
+                }
+
                 await connection.OpenAsync();
-                SqlCommand comand = new SqlCommand(
-                Query, connection);
-                comand.CommandTimeout = 300;
-                var reading = await comand.ExecuteReaderAsync();
-                string? json = ToJson(reading);
+                using var reader = await command.ExecuteReaderAsync();
+                string? json = ToJson(reader);
                 var result = JsonConvert.DeserializeObject<List<TResponse>>(json);
-                await connection.CloseAsync();
-                await reading.CloseAsync();
-                var model = new Response<TResponse>()
+
+                return new Response<TResponse>
                 {
                     Success = true,
-                    Data = result == null? default(TResponse) : result.Any()? result.FirstOrDefault(): default(TResponse),
-                    Message = "Execution Successfull",
+                    Data = result == null? default(TResponse): result.FirstOrDefault(),
+                    Message = "Execution Successful",
                     Exception = null
                 };
-
-                return model;
             }
             catch (Exception ex)
             {
-                var model = new Response<TResponse>()
+                return new Response<TResponse>
                 {
                     Success = false,
                     Data = default(TResponse),
-                    Message = ex.Message.ToString(),
+                    Message = ex.Message,
                     Exception = ex.ToString()
                 };
-
-                return model;
             }
         }
-        public async Task<Response<TResponse>> SqlReadScalerValueAsync<TResponse>(string Query)
+        public async Task<Response<TResponse>> SqlReadScalerValueAsync<TResponse>(string query, Dictionary<string, object>? parameters)
         {
             try
             {
-                var connection = new SqlConnection(ConnectionString());
-                await connection.OpenAsync();
-                SqlCommand comand = new SqlCommand(
-                Query, connection);
-                comand.CommandTimeout = 300;
-                var response = comand.ExecuteScalarAsync();
-                var reading = await response;
-                await connection.CloseAsync();
-                var model = new Response<TResponse>()
+                if (query.Contains("WHERE", StringComparison.OrdinalIgnoreCase))
                 {
-                    Success = true,
-                    Data = reading == null? default(TResponse):(TResponse)reading,
-                    Message = "Execution Successfull",
-                    Exception = null
+                    if (!query.Contains("@") || parameters == null || parameters.Count == 0)
+                    {
+                        return new Response<TResponse>
+                        {
+                            Success = false,
+                            Data = default,
+                            Message = "Query contains a WHERE clause but no parameters were provided.",
+                            Exception = "Unsafe or incomplete parameterized query."
+                        };
+                    }
+                }
+
+                using var connection = new SqlConnection(ConnectionString());
+                using var command = new SqlCommand(query, connection)
+                {
+                    CommandTimeout = TimeOut()
                 };
 
-                return model;
+                if (parameters != null)
+                {
+                    foreach (var param in parameters)
+                    {
+                        command.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                    }
+                }
+
+                await connection.OpenAsync();
+
+                object? scalarResult = await command.ExecuteScalarAsync();
+                await connection.CloseAsync();
+
+                return new Response<TResponse>
+                {
+                    Success = true,
+                    Data = scalarResult == null ? default : (TResponse)Convert.ChangeType(scalarResult, typeof(TResponse)),
+                    Message = "Execution Successful",
+                    Exception = null
+                };
             }
             catch (Exception ex)
             {
-                var model = new Response<TResponse>()
+                return new Response<TResponse>
                 {
                     Success = false,
-                    Data = default(TResponse),
-                    Message = ex.Message.ToString(),
+                    Data = default,
+                    Message = ex.Message,
                     Exception = ex.ToString()
                 };
-
-                return model;
             }
         }
         public async Task<(bool success, string? message, string? errorMessage)> SqlBulkUploadAsync<T>(List<T> model,
