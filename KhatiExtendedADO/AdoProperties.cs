@@ -47,7 +47,9 @@ namespace KhatiExtendedADO
                 using (SqlConnection sc = new SqlConnection(ConnectionString()))
                 using (SqlCommand com = new SqlCommand(query, sc))
                 {
-                    foreach (var param in parameters)
+					com.CommandTimeout = TimeOut();
+
+					foreach (var param in parameters)
                     {
                         com.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
                     }
@@ -253,7 +255,7 @@ namespace KhatiExtendedADO
             {
 
                 sqlBulkCopy.DestinationTableName = tableName;
-                sqlBulkCopy.BulkCopyTimeout = 120;
+                sqlBulkCopy.BulkCopyTimeout = TimeOut();
                 await con.OpenAsync();
                 DataTable dt = ToDataTable(model);
                 await sqlBulkCopy.WriteToServerAsync(dt);
